@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Naurwayowayo Studio</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chewy&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background-color: #fdf6eb;
+    background-image: linear-gradient(90deg, rgba(212, 235, 226, 0.5) 50%, transparent 50%), linear-gradient(rgba(212, 235, 226, 0.5) 50%, transparent 50%);
+    background-size: 40px 40px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    font-family: 'Gaegu', cursive;
+    color: #4A3125;
+  }
+
+  .app-container {
+    background: #ffffff;
+    border: 3px solid #4A3125;
+    border-radius: 16px;
+    box-shadow: 8px 8px 0px rgba(74, 49, 37, 0.15);
+    width: 100%;
+    max-width: 950px;
+    min-height: 640px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    z-index: 10;
+  }
+
+  .star-deco { position: absolute; color: #FF8BA7; font-size: 24px; pointer-events: none; opacity: 0.6; }
+
+  .page { display: none; padding: 40px; flex: 1; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+  .page.active { display: flex; flex-direction: column; }
+
+  @keyframes popIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+  #page-welcome {
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(168, 230, 207, 0.2) 20px, rgba(168, 230, 207, 0.2) 40px), repeating-linear-gradient(90deg, transparent, transparent 20px, rgba(168, 230, 207, 0.2) 20px, rgba(168, 230, 207, 0.2) 40px);
+  }
+
+  #page-welcome h1 {
+    font-family: 'Chewy', cursive; font-size: 4rem; color: #FF8BA7;
+    -webkit-text-stroke: 2px #4A3125; text-shadow: 4px 4px 0px #ffffff, 5px 5px 0px #4A3125;
+    line-height: 1; margin-bottom: 10px; transform: rotate(-2deg);
+  }
+
+  #page-welcome h2 {
+    font-size: 1.6rem; color: #4A3125; margin-bottom: 5px; font-weight: 700;
+    background: #fdf6eb; padding: 5px 20px; border-radius: 20px; border: 2px dashed #4A3125;
+  }
+
+  #page-welcome p { color: #888; font-size: 1.1rem; margin-bottom: 40px; letter-spacing: 2px; text-transform: uppercase; }
+
+  .btn-main {
+    background: #FFD166; color: #4A3125; border: 3px solid #4A3125;
+    padding: 14px 48px; font-size: 1.5rem; font-family: 'Gaegu', cursive;
+    font-weight: 700; border-radius: 30px; cursor: pointer;
+    box-shadow: 4px 4px 0px #4A3125; transition: all 0.1s ease;
+  }
+  .btn-main:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #4A3125; background: #ffc233; }
+
+  #page-layout h2, #page-camera h2, #page-result h2, #page-thankyou h2 {
+    text-align: center; font-family: 'Chewy', cursive; font-size: 2.5rem;
+    margin-bottom: 30px; -webkit-text-stroke: 1px #4A3125; color: #A8E6CF; text-shadow: 2px 2px 0px #4A3125;
+  }
+
+  .layout-grid { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+  .layout-card {
+    background: #ffffff; border: 3px solid #4A3125; border-radius: 12px; padding: 15px;
+    cursor: pointer; text-align: center; transition: all 0.2s ease; width: 170px;
+    box-shadow: 4px 4px 0px rgba(74, 49, 37, 0.2);
+  }
+  .layout-card:hover { transform: translateY(-3px); box-shadow: 4px 7px 0px rgba(74, 49, 37, 0.2); }
+  .layout-card.active { background: #FFF5F7; box-shadow: 4px 4px 0px #4A3125; border-color: #FF8BA7; }
+  
+  .layout-preview {
+    background: #fdf6eb; border: 2px dashed #4A3125; border-radius: 8px;
+    height: 180px; margin-bottom: 15px; display: flex; flex-direction: column; padding: 10px; gap: 5px;
+  }
+  .layout-preview div { background: #e6e6e6; border: 1px solid #4A3125; border-radius: 4px; flex: 1; }
+  .layout-preview.grid-layout { display: grid; grid-template-columns: 1fr 1fr; }
+  .layout-card h3 { font-size: 1.4rem; margin-bottom: 4px; color: #4A3125; }
+  .layout-card p { font-size: 1rem; color: #888; }
+
+  .camera-container { display: grid; grid-template-columns: 1fr 320px; gap: 30px; flex: 1; }
+  @media (max-width: 768px) { .camera-container { grid-template-columns: 1fr; } }
+
+  .video-wrapper {
+    position: relative; background: #fdf6eb; border: 3px solid #4A3125;
+    border-radius: 12px; overflow: hidden; aspect-ratio: 4 / 3; box-shadow: 6px 6px 0px rgba(74, 49, 37, 0.15);
+  }
+  video { width: 100%; height: 100%; object-fit: cover; }
+  
+  .countdown {
+    position: absolute; inset: 0; display: flex; justify-content: center; align-items: center;
+    font-size: 120px; font-family: 'Chewy', cursive; color: #FF8BA7;
+    -webkit-text-stroke: 3px #4A3125; text-shadow: 4px 4px 0px #4A3125;
+    pointer-events: none; opacity: 0; transition: opacity 0.2s;
+  }
+  .countdown.active { opacity: 1; }
+  .flash { position: absolute; inset: 0; background: #ffffff; opacity: 0; pointer-events: none; transition: opacity 0.1s; }
+  .flash.active { opacity: 1; }
+
+  .controls { display: flex; flex-direction: column; gap: 15px; }
+  .control-group { background: #FFFDF9; border: 2px dashed #4A3125; padding: 12px 15px; border-radius: 12px; }
+  .control-group label { display: block; font-weight: 700; font-size: 1.2rem; margin-bottom: 8px; color: #4A3125; }
+  
+  select {
+    width: 100%; padding: 8px; border: 2px solid #4A3125; border-radius: 8px;
+    outline: none; font-family: 'Gaegu', cursive; font-size: 1.1rem; font-weight: 700;
+    color: #4A3125; background: #ffffff; cursor: pointer;
+  }
+
+  .radio-group { display: flex; gap: 10px; }
+  .radio-btn { flex: 1; position: relative; }
+  .radio-btn input { position: absolute; opacity: 0; cursor: pointer; }
+  .radio-label {
+    display: block; text-align: center; padding: 6px; border: 2px solid #4A3125;
+    border-radius: 8px; cursor: pointer; font-size: 1.1rem; font-weight: 700;
+    background: #ffffff; transition: all 0.1s;
+  }
+  .radio-btn input:checked + .radio-label { background: #A8E6CF; }
+
+  .photo-progress { display: flex; gap: 8px; justify-content: center; margin-top: 15px; }
+  .photo-progress .dot {
+    width: 32px; height: 32px; border-radius: 50%; background: #ffffff; border: 2px solid #4A3125;
+    display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+    font-weight: 700; color: #4A3125; transition: 0.3s;
+  }
+  .photo-progress .dot.done { background: #A8E6CF; }
+  .photo-progress .dot.current { background: #FFD166; transform: scale(1.1); box-shadow: 2px 2px 0px #4A3125; }
+
+  .btn-action {
+    width: 100%; padding: 12px; border: 3px solid #4A3125; border-radius: 12px;
+    font-weight: 700; font-family: 'Gaegu', cursive; font-size: 1.3rem;
+    cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px #4A3125; color: #4A3125;
+  }
+  .btn-primary { background: #FF8BA7; }
+  .btn-secondary { background: #ffffff; }
+  .btn-action:hover:not(:disabled) { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #4A3125; }
+  .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .result-container { display: flex; gap: 40px; flex: 1; justify-content: center; align-items: flex-start; flex-wrap: wrap; }
+  .canvas-wrapper { border: 3px solid #4A3125; border-radius: 8px; box-shadow: 8px 8px 0px rgba(74, 49, 37, 0.15); background: #ffffff; position: relative; }
+  .canvas-wrapper::before {
+    content: ''; position: absolute; top: -12px; left: 50%; transform: translateX(-50%) rotate(-2deg);
+    width: 80px; height: 25px; background: rgba(255, 209, 102, 0.7); border: 1px solid rgba(74, 49, 37, 0.2); z-index: 5;
+  }
+  #finalCanvas { display: block; max-width: 100%; max-height: 480px; }
+
+  .edit-controls { width: 320px; display: flex; flex-direction: column; gap: 16px; }
+  .color-picker { display: flex; gap: 10px; flex-wrap: wrap; }
+  .color-swatch { width: 38px; height: 38px; border-radius: 50%; cursor: pointer; border: 2px solid #4A3125; transition: 0.2s; }
+  .color-swatch.active { transform: scale(1.15); box-shadow: 0 0 0 3px #fdf6eb, 0 0 0 5px #4A3125; }
+  .btn-download { background: #A8E6CF; margin-top: 10px; }
+
+  #page-thankyou {
+    text-align: center; justify-content: center; align-items: center;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(255, 209, 102, 0.2) 20px, rgba(255, 209, 102, 0.2) 40px), repeating-linear-gradient(90deg, transparent, transparent 20px, rgba(255, 209, 102, 0.2) 20px, rgba(255, 209, 102, 0.2) 40px);
+  }
+  #page-thankyou h1 {
+    font-family: 'Chewy', cursive; font-size: 3.5rem; color: #FF8BA7;
+    -webkit-text-stroke: 2px #4A3125; text-shadow: 4px 4px 0px #ffffff, 5px 5px 0px #4A3125;
+    margin-bottom: 20px; transform: rotate(-3deg);
+  }
+  #page-thankyou p { font-size: 1.4rem; color: #4A3125; margin-bottom: 30px; font-weight: 700; max-width: 600px; }
+  .heart-icon { font-size: 4rem; color: #FF8BA7; -webkit-text-stroke: 2px #4A3125; margin-bottom: 20px; animation: beat 1s infinite alternate; }
+  @keyframes beat { to { transform: scale(1.15); } }
+</style>
+</head>
+<body>
+
+<!-- Audio Musik Latar -->
+<audio id="bgMusic" loop>
+  <!-- Lagu Nelly - Dilemma (Direct Link) -->
+  <source src="https://archive.org/download/nelly-dilemma-feat.-kelly-rowland/Nelly%20-%20Dilemma%20%28feat.%20Kelly%20Rowland%29.mp3" type="audio/mpeg">
+</audio>
+
+<div class="star-deco" style="top: 10%; left: 5%;">★</div>
+<div class="star-deco" style="top: 80%; left: 10%; font-size: 16px;">★</div>
+<div class="star-deco" style="top: 20%; right: 8%; font-size: 32px;">★</div>
+<div class="star-deco" style="top: 70%; right: 15%;">★</div>
+<div class="star-deco" style="top: 45%; left: 3%; font-size: 18px;">★</div>
+
+<div class="app-container">
+
+  <!-- PAGE 1: WELCOME -->
+  <div class="page active" id="page-welcome">
+    <h1>Welcome to<br>Naurwayowayo</h1>
+    <h2>Naura's Way Of Wonderful Memories</h2>
+    <p>Photo Booth & Digital Studio</p>
+    <button class="btn-main" onclick="startApp()">Start Session!</button>
+  </div>
+
+  <!-- PAGE 2: LAYOUT SELECTION -->
+  <div class="page" id="page-layout">
+    <h2>Pick Your Layout</h2>
+    <div class="layout-grid">
+      <div class="layout-card active" onclick="selectLayout('A', this)">
+        <div class="layout-preview"><div></div><div></div><div></div><div></div></div>
+        <h3>Layout A</h3><p>4 Poses</p>
+      </div>
+      <div class="layout-card" onclick="selectLayout('B', this)">
+        <div class="layout-preview"><div></div><div></div><div></div></div>
+        <h3>Layout B</h3><p>3 Poses</p>
+      </div>
+      <div class="layout-card" onclick="selectLayout('C', this)">
+        <div class="layout-preview"><div></div><div></div></div>
+        <h3>Layout C</h3><p>2 Poses</p>
+      </div>
+      <div class="layout-card" onclick="selectLayout('D', this)">
+        <div class="layout-preview grid-layout"><div></div><div></div><div></div><div></div><div></div><div></div></div>
+        <h3>Layout D</h3><p>6 Poses</p>
+      </div>
+    </div>
+    <div style="text-align: center; margin-top: 30px;">
+      <button class="btn-main" onclick="prepareCamera()">Next: Camera</button>
+    </div>
+  </div>
+
+  <!-- PAGE 3: CAMERA -->
+  <div class="page" id="page-camera">
+    <h2>Strike a Pose!</h2>
+    <div class="camera-container">
+      <div>
+        <div class="video-wrapper">
+          <video id="video" autoplay playsinline></video>
+          <div class="flash" id="flash"></div>
+          <div class="countdown" id="countdown"></div>
+        </div>
+        <div class="photo-progress" id="photoProgress"></div>
+      </div>
+
+      <div class="controls">
+        <div class="control-group">
+          <label>Camera Mirror</label>
+          <div class="radio-group">
+            <label class="radio-btn">
+              <input type="radio" name="mirrorOption" value="yes" checked onchange="updateMirror()">
+              <span class="radio-label">Yes</span>
+            </label>
+            <label class="radio-btn">
+              <input type="radio" name="mirrorOption" value="no" onchange="updateMirror()">
+              <span class="radio-label">No</span>
+            </label>
+          </div>
+        </div>
+        <div class="control-group">
+          <label>Color Filter</label>
+          <select id="filterSelect">
+            <option value="none">Normal</option>
+            <option value="grayscale">B&W</option>
+            <option value="sepia">Sepia</option>
+            <option value="vintage">Vintage</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label>Countdown Timer</label>
+          <select id="countdownSelect">
+            <option value="3">3 Seconds</option>
+            <option value="5" selected>5 Seconds</option>
+          </select>
+        </div>
+        <button class="btn-action btn-primary" id="captureBtn" onclick="startCaptureSequence()">Capture Photo 1</button>
+        <div id="postCaptureActions" style="display: none; flex-direction: column; gap: 10px;">
+          <button class="btn-action btn-primary" id="nextBtn" onclick="proceedToNext()">Next Pose &rarr;</button>
+          <button class="btn-action btn-secondary" id="retakeBtn" onclick="retakePhoto()">Retake Photo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 4: RESULT -->
+  <div class="page" id="page-result">
+    <h2>Photostrip Ready!</h2>
+    <div class="result-container">
+      <div class="canvas-wrapper">
+        <canvas id="finalCanvas"></canvas>
+      </div>
+      <div class="edit-controls">
+        <div class="control-group">
+          <label>Strip Color</label>
+          <div class="color-picker" id="colorPicker"></div>
+        </div>
+        <div class="control-group">
+          <label>Final Filter</label>
+          <select id="finalFilter" onchange="drawFinalCanvas()">
+            <option value="none">Normal (Original)</option>
+            <option value="vintage">Vintage 90s</option>
+            <option value="grayscale">Classic B&W</option>
+            <option value="warm">Warm Glow</option>
+            <option value="cool">Cool Tone</option>
+            <option value="pink">Pinkish Cute</option>
+          </select>
+        </div>
+        <button class="btn-action btn-download" onclick="downloadResult()">Download Strip!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 5: THANK YOU -->
+  <div class="page" id="page-thankyou">
+    <div class="heart-icon">♥</div>
+    <h1>Thank You!</h1>
+    <p>Thank you for choosing Naurwayowayo Studio.<br>We hope you love your wonderful memories!</p>
+    <button class="btn-main" onclick="location.reload()">Start Over</button>
+  </div>
+
+</div>
+
+<script>
+  /* ======================================================
+     AUDIO & SOUND EFFECTS
+     ====================================================== */
+  const bgMusic = document.getElementById('bgMusic');
+  let audioCtx;
+
+  function playPopSound() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.1);
+    
+    gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+    
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.1);
+  }
+
+  document.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', playPopSound);
+  });
+
+  function startApp() {
+    bgMusic.volume = 0.3;
+    bgMusic.play().catch(e => console.log("Audio autoplay dicegah browser."));
+    nextPage('page-layout');
+  }
+
+  /* ======================================================
+     STATE / GLOBAL VARIABLES
+     ====================================================== */
+  let selectedLayout = 'A';
+  let totalPhotos = 4;
+  let capturedPhotos = [];
+  let currentPhotoIndex = 0;
+  let isCapturing = false;
+  let stream = null;
+
+  const stripColors = ['#ffffff', '#fdf6eb', '#FFD1DC', '#A8E6CF', '#FFD166', '#4A3125', '#E6E6FA'];
+  let selectedColor = '#ffffff';
+
+  function nextPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+  }
+
+  /* ======================================================
+     PAGE 2: LAYOUT
+     ====================================================== */
+  function selectLayout(type, element) {
+    document.querySelectorAll('.layout-card').forEach(c => c.classList.remove('active'));
+    element.classList.add('active');
+    selectedLayout = type;
+
+    if (type === 'A') totalPhotos = 4;
+    if (type === 'B') totalPhotos = 3;
+    if (type === 'C') totalPhotos = 2;
+    if (type === 'D') totalPhotos = 6;
+  }
+
+  async function prepareCamera() {
+    nextPage('page-camera');
+    capturedPhotos = new Array(totalPhotos).fill(null);
+    currentPhotoIndex = 0;
+    updateProgressUI();
+    resetCameraUI();
+
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+      document.getElementById('video').srcObject = stream;
+    } catch (err) {
+      alert('Failed to access camera. Please allow permissions.');
+    }
+  }
+
+  /* ======================================================
+     PAGE 3: CAMERA
+     ====================================================== */
+  const video = document.getElementById('video');
+  const countdownEl = document.getElementById('countdown');
+  const flashEl = document.getElementById('flash');
+  const captureBtn = document.getElementById('captureBtn');
+  const postCaptureActions = document.getElementById('postCaptureActions');
+  const nextBtn = document.getElementById('nextBtn');
+
+  function updateMirror() {
+    const isMirrored = document.querySelector('input[name="mirrorOption"]:checked').value === 'yes';
+    video.style.transform = isMirrored ? 'scaleX(-1)' : 'scaleX(1)';
+  }
+
+  function updateProgressUI() {
+    const progressContainer = document.getElementById('photoProgress');
+    progressContainer.innerHTML = '';
+    for (let i = 0; i < totalPhotos; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      dot.textContent = i + 1;
+      if (capturedPhotos[i] !== null) dot.classList.add('done');
+      if (i === currentPhotoIndex) dot.classList.add('current');
+      progressContainer.appendChild(dot);
+    }
+  }
+
+  function resetCameraUI() {
+    captureBtn.style.display = 'block';
+    captureBtn.disabled = false;
+    captureBtn.textContent = `Capture Photo ${currentPhotoIndex + 1}`;
+    postCaptureActions.style.display = 'none';
+    updateProgressUI();
+  }
+
+  function showPostCaptureUI() {
+    captureBtn.style.display = 'none';
+    postCaptureActions.style.display = 'flex';
+    nextBtn.textContent = (currentPhotoIndex === totalPhotos - 1) ? 'Finish & See Result' : 'Next Pose \u2192';
+    updateProgressUI();
+  }
+
+  function takeSnapshot() {
+    const canvas = document.createElement('canvas');
+    const w = video.videoWidth || 640;
+    const h = video.videoHeight || 480;
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d');
+
+    if (document.querySelector('input[name="mirrorOption"]:checked').value === 'yes') {
+      ctx.translate(w, 0); ctx.scale(-1, 1);
+    }
+    ctx.drawImage(video, 0, 0, w, h);
+
+    const filter = document.getElementById('filterSelect').value;
+    if (filter !== 'none') {
+      const imgData = ctx.getImageData(0, 0, w, h);
+      const d = imgData.data;
+      for (let i = 0; i < d.length; i += 4) {
+        let r = d[i], g = d[i+1], b = d[i+2];
+        if (filter === 'grayscale') { const gray = 0.299*r + 0.587*g + 0.114*b; d[i]=d[i+1]=d[i+2]=gray; }
+        else if (filter === 'sepia') { d[i]=r*0.393+g*0.769+b*0.189; d[i+1]=r*0.349+g*0.686+b*0.168; d[i+2]=r*0.272+g*0.534+b*0.131; }
+        else if (filter === 'vintage') { d[i]=r*0.9+30; d[i+1]=g*0.85+20; d[i+2]=b*0.75+10; }
+      }
+      ctx.putImageData(imgData, 0, 0);
+    }
+    return canvas;
+  }
+
+  async function startCaptureSequence() {
+    if (isCapturing) return;
+    isCapturing = true;
+    captureBtn.disabled = true;
+
+    const secs = parseInt(document.getElementById('countdownSelect').value);
+    let count = secs;
+    countdownEl.textContent = count;
+    countdownEl.classList.add('active');
+
+    const timer = setInterval(() => {
+      count--;
+      if (count > 0) {
+        countdownEl.textContent = count;
+        playPopSound();
+      } else {
+        clearInterval(timer);
+        countdownEl.classList.remove('active');
+        flashEl.classList.add('active');
+        setTimeout(() => flashEl.classList.remove('active'), 150);
+        capturedPhotos[currentPhotoIndex] = takeSnapshot();
+        isCapturing = false;
+        showPostCaptureUI();
+      }
+    }, 1000);
+  }
+
+  function retakePhoto() {
+    capturedPhotos[currentPhotoIndex] = null;
+    resetCameraUI();
+  }
+
+  function proceedToNext() {
+    if (currentPhotoIndex < totalPhotos - 1) {
+      currentPhotoIndex++;
+      resetCameraUI();
+    } else {
+      finishSession();
+    }
+  }
+
+  /* ======================================================
+     PAGE 4: RESULT & EDIT
+     ====================================================== */
+  function finishSession() {
+    if (stream) stream.getTracks().forEach(t => t.stop());
+    nextPage('page-result');
+
+    const picker = document.getElementById('colorPicker');
+    picker.innerHTML = '';
+
+    stripColors.forEach(col => {
+      const sw = document.createElement('div');
+      sw.className = 'color-swatch' + (col === selectedColor ? ' active' : '');
+      sw.style.backgroundColor = col;
+      sw.onclick = () => {
+        document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+        sw.classList.add('active');
+        selectedColor = col;
+        drawFinalCanvas();
+      };
+      picker.appendChild(sw);
+    });
+    drawFinalCanvas();
+  }
+
+  function drawFinalCanvas() {
+    const canvas = document.getElementById('finalCanvas');
+    const ctx = canvas.getContext('2d');
+    const filter = document.getElementById('finalFilter').value;
+
+    const pW = 300, pH = 225, gap = 15, pad = 25, footer = 70;
+    let canvasW, canvasH;
+
+    if (selectedLayout === 'D') {
+      canvasW = (pW * 2) + (gap * 3) + (pad * 2);
+      canvasH = (pH * 3) + (gap * 4) + (pad * 2) + footer;
+    } else {
+      canvasW = pW + (pad * 2);
+      canvasH = (pH * totalPhotos) + (gap * (totalPhotos - 1)) + (pad * 2) + footer;
+    }
+
+    canvas.width = canvasW;
+    canvas.height = canvasH;
+
+    ctx.fillStyle = selectedColor;
+    ctx.fillRect(0, 0, canvasW, canvasH);
+    
+    if (selectedColor !== '#ffffff') {
+        ctx.strokeStyle = 'rgba(74, 49, 37, 0.3)';
+        ctx.setLineDash([10, 10]);
+        ctx.lineWidth = 4;
+        ctx.strokeRect(10, 10, canvasW - 20, canvasH - 20);
+        ctx.setLineDash([]); 
+    }
+
+    for (let i = 0; i < totalPhotos; i++) {
+      if (!capturedPhotos[i]) continue;
+
+      let x, y;
+      if (selectedLayout === 'D') {
+        const col = i % 2;
+        const row = Math.floor(i / 2);
+        x = pad + col * (pW + gap);
+        y = pad + row * (pH + gap);
+      } else {
+        x = pad;
+        y = pad + i * (pH + gap);
+      }
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(x - 6, y - 6, pW + 12, pH + 12);
+      ctx.strokeStyle = '#4A3125';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x - 6, y - 6, pW + 12, pH + 12);
+
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = pW; tempCanvas.height = pH;
+      const tCtx = tempCanvas.getContext('2d');
+      tCtx.drawImage(capturedPhotos[i], 0, 0, pW, pH);
+
+      if (filter !== 'none') {
+        const imgData = tCtx.getImageData(0, 0, pW, pH);
+        const d = imgData.data;
+        for (let j = 0; j < d.length; j += 4) {
+          let r = d[j], g = d[j+1], b = d[j+2];
+          if (filter === 'vintage') { d[j]=r*0.9+30; d[j+1]=g*0.85+20; d[j+2]=b*0.75+10; }
+          else if (filter === 'grayscale') { const gray = 0.299*r+0.587*g+0.114*b; d[j]=d[j+1]=d[j+2]=gray; }
+          else if (filter === 'warm') { d[j]+=30; d[j+1]+=10; d[j+2]-=20; }
+          else if (filter === 'cool') { d[j]-=20; d[j+1]+=10; d[j+2]+=40; }
+          else if (filter === 'pink') { d[j]+=40; d[j+1]-=10; d[j+2]+=20; }
+        }
+        tCtx.putImageData(imgData, 0, 0);
+      }
+      ctx.drawImage(tempCanvas, x, y);
+    }
+
+    const isDark = selectedColor === '#4A3125';
+    ctx.fillStyle = isDark ? '#ffffff' : '#4A3125';
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 20px "Gaegu", cursive';
+    ctx.fillText("Naurwayowayo Studio", canvasW / 2, canvasH - 35);
+    
+    ctx.font = '16px "Gaegu", cursive';
+    const date = new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+    ctx.fillText(date, canvasW / 2, canvasH - 15);
+  }
+
+  // Fungsi saat klik Download, langsung pindah ke halaman Thank You
+  function downloadResult() {
+    const canvas = document.getElementById('finalCanvas');
+    const link = document.createElement('a');
+    link.download = `Naurwayowayo-${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    
+    // Pindah ke halaman Thank You setelah file mulai terunduh
+    setTimeout(() => {
+      nextPage('page-thankyou');
+    }, 500);
+  }
+</script>
